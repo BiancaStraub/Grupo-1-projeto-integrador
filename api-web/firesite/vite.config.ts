@@ -6,4 +6,12 @@
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-export default defineConfig();
+export default defineConfig({
+  vite: {
+    server: {
+      host: true,
+      port: 3101,
+      allowedHosts: ['grupo01pojeto20261.escolatecnicaadelia.info']
+    }
+  }
+});

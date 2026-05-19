@@ -1,3 +1,11 @@
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'https://grupo01pojeto20261.escolatecnicaadelia.info/api'
+});
+
+export default api;
+
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
