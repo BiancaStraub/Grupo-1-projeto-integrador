@@ -9,7 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VencimentosRouteImport } from './routes/vencimentos'
+import { Route as SolicitacoesRouteImport } from './routes/solicitacoes'
+import { Route as ScannerRouteImport } from './routes/scanner'
 import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as InventarioRouteImport } from './routes/inventario'
@@ -22,9 +23,14 @@ import { Route as AlertasRouteImport } from './routes/alertas'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CadastroIdRouteImport } from './routes/cadastro.$id'
 
-const VencimentosRoute = VencimentosRouteImport.update({
-  id: '/vencimentos',
-  path: '/vencimentos',
+const SolicitacoesRoute = SolicitacoesRouteImport.update({
+  id: '/solicitacoes',
+  path: '/solicitacoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScannerRoute = ScannerRouteImport.update({
+  id: '/scanner',
+  path: '/scanner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RelatoriosRoute = RelatoriosRouteImport.update({
@@ -94,7 +100,8 @@ export interface FileRoutesByFullPath {
   '/inventario': typeof InventarioRoute
   '/login': typeof LoginRoute
   '/relatorios': typeof RelatoriosRoute
-  '/vencimentos': typeof VencimentosRoute
+  '/scanner': typeof ScannerRoute
+  '/solicitacoes': typeof SolicitacoesRoute
   '/cadastro/$id': typeof CadastroIdRoute
 }
 export interface FileRoutesByTo {
@@ -108,7 +115,8 @@ export interface FileRoutesByTo {
   '/inventario': typeof InventarioRoute
   '/login': typeof LoginRoute
   '/relatorios': typeof RelatoriosRoute
-  '/vencimentos': typeof VencimentosRoute
+  '/scanner': typeof ScannerRoute
+  '/solicitacoes': typeof SolicitacoesRoute
   '/cadastro/$id': typeof CadastroIdRoute
 }
 export interface FileRoutesById {
@@ -123,7 +131,8 @@ export interface FileRoutesById {
   '/inventario': typeof InventarioRoute
   '/login': typeof LoginRoute
   '/relatorios': typeof RelatoriosRoute
-  '/vencimentos': typeof VencimentosRoute
+  '/scanner': typeof ScannerRoute
+  '/solicitacoes': typeof SolicitacoesRoute
   '/cadastro/$id': typeof CadastroIdRoute
 }
 export interface FileRouteTypes {
@@ -139,7 +148,8 @@ export interface FileRouteTypes {
     | '/inventario'
     | '/login'
     | '/relatorios'
-    | '/vencimentos'
+    | '/scanner'
+    | '/solicitacoes'
     | '/cadastro/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -153,7 +163,8 @@ export interface FileRouteTypes {
     | '/inventario'
     | '/login'
     | '/relatorios'
-    | '/vencimentos'
+    | '/scanner'
+    | '/solicitacoes'
     | '/cadastro/$id'
   id:
     | '__root__'
@@ -167,7 +178,8 @@ export interface FileRouteTypes {
     | '/inventario'
     | '/login'
     | '/relatorios'
-    | '/vencimentos'
+    | '/scanner'
+    | '/solicitacoes'
     | '/cadastro/$id'
   fileRoutesById: FileRoutesById
 }
@@ -182,17 +194,25 @@ export interface RootRouteChildren {
   InventarioRoute: typeof InventarioRoute
   LoginRoute: typeof LoginRoute
   RelatoriosRoute: typeof RelatoriosRoute
-  VencimentosRoute: typeof VencimentosRoute
+  ScannerRoute: typeof ScannerRoute
+  SolicitacoesRoute: typeof SolicitacoesRoute
   CadastroIdRoute: typeof CadastroIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/vencimentos': {
-      id: '/vencimentos'
-      path: '/vencimentos'
-      fullPath: '/vencimentos'
-      preLoaderRoute: typeof VencimentosRouteImport
+    '/solicitacoes': {
+      id: '/solicitacoes'
+      path: '/solicitacoes'
+      fullPath: '/solicitacoes'
+      preLoaderRoute: typeof SolicitacoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scanner': {
+      id: '/scanner'
+      path: '/scanner'
+      fullPath: '/scanner'
+      preLoaderRoute: typeof ScannerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/relatorios': {
@@ -286,7 +306,8 @@ const rootRouteChildren: RootRouteChildren = {
   InventarioRoute: InventarioRoute,
   LoginRoute: LoginRoute,
   RelatoriosRoute: RelatoriosRoute,
-  VencimentosRoute: VencimentosRoute,
+  ScannerRoute: ScannerRoute,
+  SolicitacoesRoute: SolicitacoesRoute,
   CadastroIdRoute: CadastroIdRoute,
 }
 export const routeTree = rootRouteImport

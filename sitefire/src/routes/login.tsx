@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Flame, Shield, ClipboardCheck } from "lucide-react";
+import { Flame, Shield, ClipboardCheck, ArrowLeft } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
@@ -23,12 +24,12 @@ function LoginPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) navigate({ to: "/dashboard" });
+    if (!loading && user) navigate({ to: "/empresas" });
   }, [user, loading, navigate]);
 
   const quickLogin = async (perfil: "admin" | "inspetor") => {
     const creds = perfil === "admin"
-      ? { email: "admin@adelia.edu.br", password: "Admin@SafeFlow2026", nome: "Administrador", to: "/dashboard" as const }
+      ? { email: "admin@adelia.edu.br", password: "Admin@SafeFlow2026", nome: "Administrador", to: "/empresas" as const }
       : { email: "inspetor@adelia.edu.br", password: "Inspetor#SafeFlow26", nome: "Inspetor", to: "/inspecao" as const };
     setEmail(creds.email);
     setPassword(creds.password);
@@ -69,7 +70,7 @@ function LoginPage() {
             toast.error(error); return;
           }
         }
-        navigate({ to: "/dashboard" });
+        navigate({ to: "/empresas" });
       } else {
         if (!nome) { toast.error("Informe seu nome"); return; }
         const { error } = await signUp(email, password, nome);
@@ -83,7 +84,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-dvh grid lg:grid-cols-2 bg-background">
+    <div className="min-h-dvh grid lg:grid-cols-2 bg-background relative pb-10 lg:pb-0">
       <div className="hidden lg:flex flex-col justify-between bg-carbon text-carbon-foreground p-12 relative overflow-hidden">
         <div className="flex items-center gap-3 relative z-10">
           <div className="size-10 bg-security/20 rounded-lg flex items-center justify-center">
@@ -153,8 +154,21 @@ function LoginPage() {
             </div>
             <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed">Login com 1 clique — ideal para apresentação. Admin → Dashboard · Inspetor → Inspeção.</p>
           </div>
+
+          <div className="mt-6">
+            <Link
+              to="/"
+              className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-lg text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="size-4" strokeWidth={2} />
+              Voltar ao portal público de auditoria
+            </Link>
+          </div>
         </div>
       </div>
+      <footer className="absolute bottom-3 inset-x-0 text-center text-xs text-muted-foreground px-4 pointer-events-none">
+        Desenvolvido por Grupo 1 (Bianca, Bryan e Luciano) — Projeto Integrador
+      </footer>
     </div>
   );
 }

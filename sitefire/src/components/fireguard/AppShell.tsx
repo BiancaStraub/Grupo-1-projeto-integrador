@@ -1,26 +1,56 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Flame, LayoutDashboard, Building2, Wrench, ClipboardCheck, CalendarClock, BellRing, LogOut, Menu, X, Users, Settings as SettingsIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Flame, LayoutDashboard, Building2, BellRing, LogOut, Menu, X, Users, Sun, Moon, Inbox, FileText, Settings, QrCode } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth, type Role } from "@/lib/fireguard/auth";
 import { NotificationBell } from "@/components/fireguard/NotificationBell";
 
 const NAV: { to: string; label: string; icon: typeof LayoutDashboard; roles: Role[] }[] = [
-  { to: "/dashboard", label: "Visão Geral", icon: LayoutDashboard, roles: ["admin", "subadmin"] },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["admin", "subadmin"] },
   { to: "/empresas", label: "Extintores", icon: Building2, roles: ["admin", "subadmin", "inspetor"] },
-  { to: "/relatorios", label: "Manutenções", icon: Wrench, roles: ["admin", "subadmin"] },
-  { to: "/inspecao", label: "Inspeções", icon: ClipboardCheck, roles: ["admin", "subadmin", "inspetor"] },
-  { to: "/vencimentos", label: "Vencimentos", icon: CalendarClock, roles: ["admin", "subadmin"] },
+  { to: "/scanner", label: "Scanner QR", icon: QrCode, roles: ["admin", "subadmin", "inspetor"] },
   { to: "/alertas", label: "Alertas", icon: BellRing, roles: ["admin", "subadmin"] },
   { to: "/equipe", label: "Equipe", icon: Users, roles: ["admin"] },
-  { to: "/configuracoes", label: "Configurações", icon: SettingsIcon, roles: ["admin"] },
+  { to: "/relatorios", label: "Relatórios", icon: FileText, roles: ["admin", "subadmin", "inspetor"] },
+  { to: "/solicitacoes", label: "Solicitações", icon: Inbox, roles: ["admin", "subadmin", "inspetor"] },
+  { to: "/configuracoes", label: "Configurações", icon: Settings, roles: ["admin", "subadmin", "inspetor"] },
 ];
+
+const PREFS_KEY = "fireguard:prefs";
+
+function readDark(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const raw = localStorage.getItem(PREFS_KEY);
+    if (!raw) return false;
+    const p = JSON.parse(raw);
+    return !!p.darkMode;
+  } catch { return false; }
+}
+function writeDark(on: boolean) {
+  try {
+    const raw = localStorage.getItem(PREFS_KEY);
+    const p = raw ? JSON.parse(raw) : {};
+    p.darkMode = on;
+    localStorage.setItem(PREFS_KEY, JSON.stringify(p));
+  } catch { /* ignore */ }
+  const r = document.documentElement;
+  if (on) r.classList.add("dark"); else r.classList.remove("dark");
+}
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { user, profile, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [dark, setDark] = useState<boolean>(false);
+
+  useEffect(() => { setDark(readDark()); }, []);
+  const toggleTheme = useCallback(() => {
+    const next = !readDark();
+    writeDark(next);
+    setDark(next);
+  }, []);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -38,7 +68,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-dvh bg-background flex">
       {/* Sidebar desktop */}
       <aside className="hidden md:flex w-20 shrink-0 flex-col items-center py-5 gap-2 bg-card border-r border-border sticky top-0 h-dvh">
-        <Link to="/dashboard" className="size-11 bg-security rounded-xl flex items-center justify-center shadow-glow-red mb-3">
+        <Link to="/empresas" className="size-11 bg-security rounded-xl flex items-center justify-center shadow-glow-red mb-3">
           <Flame className="size-6 text-security-foreground" strokeWidth={2.5} />
         </Link>
         {items.map((n, i) => {
@@ -71,7 +101,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">FireGuard · NBR 13485 / 12693</p>
             <p className="text-sm font-medium capitalize">{hoje}</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
+            <button
+              onClick={toggleTheme}
+              title={dark ? "Tema claro" : "Tema escuro"}
+              aria-label="Alternar tema"
+              className="size-9 rounded-lg border border-border bg-background hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            </button>
             <NotificationBell />
             <div className="text-right leading-tight">
               <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{role === "admin" ? "Administrador" : role === "subadmin" ? "Subadmin" : "Inspetor"}</p>
@@ -88,7 +126,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* Bottom Nav mobile */}
         <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-card/95 backdrop-blur border-t border-border">
           <div className="flex items-center justify-around px-1 py-1.5">
-            {items.slice(0, 5).map((n, i) => {
+            {items.slice(0, 4).map((n, i) => {
               const active = location.pathname.startsWith(n.to);
               return (
                 <Link key={`bn-${n.to}-${i}`} to={n.to} className={cn(
@@ -109,7 +147,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           {open && (
             <div className="border-t border-border bg-card px-3 py-3 flex flex-col gap-1 max-h-[60vh] overflow-y-auto">
-              {items.slice(5).map((n, i) => {
+              {items.slice(4).map((n, i) => {
                 const active = location.pathname.startsWith(n.to);
                 return (
                   <Link key={`more-${n.to}-${i}`} to={n.to} className={cn(
@@ -121,6 +159,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   </Link>
                 );
               })}
+              <button onClick={toggleTheme} className="px-3 py-2.5 text-sm font-medium text-muted-foreground flex items-center gap-3 text-left">
+                {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+                {dark ? "Tema claro" : "Tema escuro"}
+              </button>
               <button onClick={async () => { await signOut(); navigate({ to: "/login" }); }} className="px-3 py-2.5 text-sm font-medium text-muted-foreground flex items-center gap-3 text-left">
                 <LogOut className="size-4" />Sair
               </button>
